@@ -1,5 +1,4 @@
-import React from "react";
-
+import React from "react"
 import { axiosWithAuth } from "./util/axiosWithAuth";
 
 // make a post request to retrieve a token from the api
@@ -14,8 +13,6 @@ class  Login extends React.Component{
     }
   };
 
-  
- 
   handleChange = (e) => {
     this.setState({
       credentials: {
@@ -24,17 +21,14 @@ class  Login extends React.Component{
       }
     });
   };
-    
- 
-
+  
    theSubmit = e =>{
     e.preventDefault();
     axiosWithAuth()
     .post("/api/login",this.state.credentials)
-
     .then (res => {
       window.localStorage.setItem('token', res.data.payload)
-      // this.props.history.push('/protected')
+      this.props.history.push('/protected')
   })
   .catch (err => console.log(err))
   }

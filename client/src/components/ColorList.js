@@ -1,7 +1,13 @@
-import React, { useState,useHistory } from "react";
-import axios from "axios";
+import React, { useState} from "react";
+// import axios from "axios";
+import { useHistory} from "react-router-dom";
+import { axiosWithAuth } from "./util/axiosWithAuth";
 
 const initialColor = {
+  color: "",
+  code: { hex: "" }
+};
+const addlColor = {
   color: "",
   code: { hex: "" }
 };
@@ -10,7 +16,10 @@ const ColorList = ({ colors, updateColors }) => {
   console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
-  const {push}=useHistory()
+  const [colorToAdd, setColorToAdd] = useState(addlColor);
+  const { push } = useHistory();
+  // const { id } = useParams();
+
 
   const editColor = color => {
     setEditing(true);
@@ -19,25 +28,49 @@ const ColorList = ({ colors, updateColors }) => {
 
   const saveEdit = e => {
     e.preventDefault();
-    // Make a put request to save your updated color
-    // think about where will you get the id from...
-    // where is is saved right now?
-    axios.put("http://localhost:5000/api/colors/:id",colors)
+
+    axiosWithAuth()
+    .put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit)
     .then((res) => {
-      updateColors(res.data)
-     push('/colors')
-  })
-  .catch(err=> console.log(err))
     
+      console.log("color editted", res.data)
+     
+      updateColors(colors.map(color => {
+        if (color.id === res.id) {
+          return res.data;
+        }
+        return color;
+      }))
+      push("/api/colors");
+    })
+    .catch((err) => {
+      console.log("colorlist", err);
+    })
   };
 
   const deleteColor = color => {
     // make a delete request to delete this color
-    axios     
-    .delete("http://localhost:5000/api/colors/:id/${color}")
-    .then(res => console.log(res))
-    .catch(err => console.log(err));
+    axiosWithAuth()
+    ///api/colors/123
+    .delete(`http://localhost:5000/api/colors/${color.id}`)
+    .then((res) => {
+      console.log("Deleted Color ID", res.data);
+      //  editColor(res.data);
+      const newItems = colors.filter(e => e.id !== color.id)
+      updateColors(newItems);
+    })
+    .catch((err) => {
+      console.log("error in colorlist", err)
+    })
   };
+
+
+  const handleChange = (e) => {
+    setColorToAdd({
+        [e.target.name]: e.target.value
+      })
+    };
+  
 
   return (
     <div className="colors-wrap">
@@ -94,6 +127,7 @@ const ColorList = ({ colors, updateColors }) => {
       )}
       <div className="spacer" />
       {/* stretch - build another form here to add a color */}
+     
     </div>
   );
 };

@@ -1,26 +1,36 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Link,Switch} from "react-router-dom";
-import BubblePage from"./components/BubblePage";
+import { BrowserRouter as Router, Route,Switch,Link } from "react-router-dom";
+import BubblePage from "./components/BubblePage";
+import PrivateRoute from "./components/PrivateRoute";
 import Login from "./components/Login";
-import PrivateRoute from "./components/PrivateRoute"
-import ColorList from "./components/ColorList"
-
 import "./styles.scss";
+import ColorList from "./components/ColorList";
+import addColor from "./components/addColor"
 
 function App() {
-  const [color, setColor] = useState([]);
   return (
     <Router>
       <div className="App">
 <nav>
-<Link to="/login">Login</Link>
-<Link to="/protected">colors</Link>
-</nav>
-    <Switch>
-      <PrivateRoute exact path="/protected" component={BubblePage} />
-        <Route exact path="/" component={Login} />
-        <ColorList color={color} setColor={setColor}/>
-   </Switch>
+ <div className="link">
+      <Link to="/login">Login</Link>
+        <Link to="/protected">Color List</Link>
+        <Link to="/addcolor">Add Color</Link>
+  </div>
+
+        </nav>
+         {/* 
+          Build a PrivateRoute component that will 
+          display BubblePage when you're authenticated 
+        */}
+        <Switch>
+          <PrivateRoute exact path="/protected" component={BubblePage}/>
+          <Route path="/login" component={Login}/>
+          <Route path="/addcolor" component={addColor} />
+          <Route component={Login}/>
+       
+        </Switch>
+       
       </div>
     </Router>
   );
